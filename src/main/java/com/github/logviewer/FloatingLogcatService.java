@@ -220,6 +220,22 @@ public class FloatingLogcatService extends Service {
                 return mIntercepted;
             }
         });
+        mBinding.toolbar.getMenu().removeItem(R.id.floating);
+
+        mBinding.toolbar.setOnMenuItemClickListener(item -> {
+                    if (item.getItemId() == R.id.clear) {
+                        mAdapter.clear();
+                    } else if (item.getItemId() == R.id.export) {
+                        LogcatReader.exportLog(
+                                mBinding,
+                                mAdapter,
+                                getApplicationContext());
+                    } else {
+                        return false;
+                    }
+                    return true;
+                }
+        );
     }
 
     private Date latestTime;
