@@ -1,34 +1,51 @@
 package de.brudaswen.android.logcat.core.uuid
 
+import java.nio.ByteBuffer
 import java.security.MessageDigest
-import kotlin.experimental.and
-import kotlin.experimental.or
-import kotlin.uuid.Uuid
+import java.util.UUID
 
 /**
- * Generate namespace name-based [Uuid] (version 5).
+ * Generate namespace name-based [UUID] (version 5).
  *
- * @param namespace The namespace [Uuid] to use.
+ * @param namespace The namespace [UUID] to use.
  * @param name The name (String) to use.
  */
-internal fun Uuid.Companion.v5(namespace: Uuid, name: String): Uuid =
+internal fun UUID.v5(namespace: UUID, name: String): UUID =
     v5(namespace, name.toByteArray())
 
 /**
- * Generate namespace name-based [Uuid] using SHA-1 (UUID version 5).
+ * Generate namespace name-based [UUID] using SHA-1 (UUID version 5).
  *
- * @param namespace The namespace [Uuid] to use.
+ * @param namespace The namespace [UUID] to use.
  * @param name The name (ByteArray) to use.
  */
-internal fun Uuid.Companion.v5(namespace: Uuid, name: ByteArray): Uuid =
-    fromByteArray(
-        byteArray = MessageDigest.getInstance("SHA-1").apply {
-            update(namespace.toByteArray())
-            update(name)
-        }.digest().apply {
-            this[6] = (this[6] and 0x0f.toByte()) // clear version
-            this[6] = (this[6] or 0x50.toByte()) // set to version 5
-            this[8] = (this[8] and 0x3f.toByte()) // clear variant
-            this[8] = (this[8] or 0x80.toByte()) // set to IETF variant
-        }.copyOf(16),
-    )
+internal fun UUID.v5(namespace: UUID, name: ByteArray): UUID {
+    val hash = MessageDigest.getInstance("SHA-1").apply {
+        update(namespace.toByteArray())
+        update(name)
+    }.digest().copyOf(16)
+
+    // Version & Variant anpassen (RFC 4122, v5)
+    hash[6] = (hash[6].toInt() and 0x0F or 0x50).toByte() // Version 5
+    hash[8] = (hash[8].toInt() and 0x3F or 0x80).toByte() // IETF variant
+
+    return fromByteArray(hash)
+}
+
+/**
+ * Convert UUID to 16-byte array.
+ */
+internal fun UUID.toByteArray(): ByteArray =
+    ByteBuffer.allocate(16)
+        .putLong(mostSignificantBits)
+        .putLong(leastSignificantBits)
+        .array()
+
+/**
+ * Create UUID from 16-byte array.
+ */
+internal fun UUID.fromByteArray(bytes: ByteArray): UUID {
+    require(bytes.size == 16) { "UUID byte array must be exactly 16 bytes" }
+    val buffer = ByteBuffer.wrap(bytes)
+    return UUID(buffer.long, buffer.long)
+}
