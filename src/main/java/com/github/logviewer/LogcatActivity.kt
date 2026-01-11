@@ -23,7 +23,7 @@ class LogcatActivity : AppCompatActivity() {
 
         private fun getIntent(context: Context?, list: ArrayList<String>?): Intent {
             return Intent(context, LogcatActivity::class.java)
-                .putStringArrayListExtra("exclude_list", list)
+                .putStringArrayListExtra(LogcatReader.EXCLUDE_LIST_KEY, list)
         }
     }
 
@@ -35,7 +35,7 @@ class LogcatActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val excludeList: MutableList<Pattern> = ArrayList()
-        intent.getStringArrayListExtra("exclude_list")?.let {
+        intent.getStringArrayListExtra(LogcatReader.EXCLUDE_LIST_KEY)?.let {
             for (pattern in it) {
                 excludeList.add(Pattern.compile(pattern))
             }

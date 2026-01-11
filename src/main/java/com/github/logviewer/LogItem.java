@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.ColorRes;
+import de.brudaswen.android.logcat.core.data.LogcatItem;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -11,8 +12,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class LogItem implements Parcelable {
 
@@ -22,9 +21,6 @@ public class LogItem implements Parcelable {
     private static final String PRIORITY_WARNING = "W";
     private static final String PRIORITY_ERROR = "E";
     private static final String PRIORITY_FATAL = "F";
-
-    private static final Pattern sLogcatPattern = Pattern.compile(
-              "([0-9^-]+-[0-9^ ]+ [0-9^:]+:[0-9^:]+\\.[0-9]+) +([0-9]+) +([0-9]+) ([VDIWEF]) ((?!: ).)+: (.*)");
 
     private static final HashMap<String, Integer> LOGCAT_COLORS = new HashMap<String, Integer>() {{
         put(PRIORITY_VERBOSE, R.color.logcat_verbose);
@@ -44,45 +40,36 @@ public class LogItem implements Parcelable {
         add(PRIORITY_FATAL);
     }};
 
-    static final Pattern IGNORED_LOG = Pattern.compile("--------- beginning of (.*)");
-
     public Date time;
     public int processId;
     public int threadId;
-    public String priority;
+    public String level;
     public String tag;
     public String content;
     public String origin;
 
-    LogItem(String line) throws IllegalStateException, ParseException {
-        Matcher matcher = sLogcatPattern.matcher(line);
-        if (!matcher.find()) {
-            throw new IllegalStateException("logcat pattern not match: " + line);
-        }
+    LogItem(LogcatItem logcatItem) throws IllegalStateException, ParseException {
 
-        String timeText = matcher.group(1);
-        String pidText = matcher.group(2);
-        String tidText = matcher.group(3);
-        String tagText = matcher.group(4);
-        String prefixText = matcher.group(5);
-        String contentText = matcher.group(6);
+        time = new Date(logcatItem.getDate().toEpochMilliseconds());
+        //time = new SimpleDateFormat("MM-dd HH:mm:ss.SSS", Locale.ROOT).parse(timeText);
 
-        time = new SimpleDateFormat("MM-dd hh:mm:ss.SSS", Locale.getDefault()).parse(timeText);
-        processId = Integer.parseInt(pidText);
-        threadId = Integer.parseInt(tidText);
-        priority = tagText;
-        tag = prefixText;
-        content = contentText;
-        origin = line;
+        processId = logcatItem.getPid();
+        threadId = logcatItem.getTid();
+        level = logcatItem.getLevel().name().substring(0, 1);
+        tag = logcatItem.getTag();
+        content = logcatItem.getMessage();
+        origin = (String.format(Locale.getDefault(),"%s %5d %5d %s TAG='%s' %s",
+                new SimpleDateFormat("MM-dd HH:mm:ss.SSS", Locale.ROOT)
+                        .format(time), processId, threadId, level, tag, content));
     }
 
     @ColorRes
     int getColorRes() {
-        return LOGCAT_COLORS.get(priority);
+        return LOGCAT_COLORS.get(level);
     }
 
     boolean isFiltered(String filter) {
-        return SUPPORTED_FILTERS.indexOf(priority) < SUPPORTED_FILTERS.indexOf(filter);
+        return SUPPORTED_FILTERS.indexOf(level) < SUPPORTED_FILTERS.indexOf(filter);
     }
 
     @Override
@@ -95,7 +82,7 @@ public class LogItem implements Parcelable {
         dest.writeLong(this.time != null ? this.time.getTime() : -1);
         dest.writeInt(this.processId);
         dest.writeInt(this.threadId);
-        dest.writeString(this.priority);
+        dest.writeString(this.level);
         dest.writeString(this.tag);
         dest.writeString(this.content);
         dest.writeString(this.origin);
@@ -106,7 +93,7 @@ public class LogItem implements Parcelable {
         this.time = tmpTime == -1 ? null : new Date(tmpTime);
         this.processId = in.readInt();
         this.threadId = in.readInt();
-        this.priority = in.readString();
+        this.level = in.readString();
         this.tag = in.readString();
         this.content = in.readString();
         this.origin = in.readString();
