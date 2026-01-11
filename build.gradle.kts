@@ -25,11 +25,10 @@ android {
         viewBinding = true
     }
 
-    compileSdk = 36
-    buildToolsVersion = "36.0.0"
+    compileSdk = 34
 
     defaultConfig {
-        minSdk = 21
+        minSdk = 19
     }
 
     buildTypes {
@@ -41,18 +40,18 @@ android {
     namespace = "com.github.logviewer"
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "21"
+        jvmTarget = "17"
     }
 }
 
 dependencies {
     //noinspection UseTomlInstead
     implementation("androidx.appcompat:appcompat:1.7.1")
-    implementation("androidx.activity:activity-ktx:1.10.1")
-    implementation("com.google.android.material:material:1.12.0")
+    implementation("androidx.activity:activity-ktx:1.8.2")
+    implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
 }
