@@ -1,17 +1,7 @@
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        //noinspection UseTomlInstead
-        classpath("com.android.tools.build:gradle:8.13.2")
-    }
-}
-
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
+    id("com.android.library") version "8.13.2"
+    id("org.jetbrains.kotlin.android") version "2.2.21"
+    id("maven-publish")
 }
 
 android {
@@ -34,12 +24,36 @@ android {
     }
     namespace = "com.github.logviewer"
 
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
+
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
+    }
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("release") {
+                from(components["release"])
+
+                // optional: if JitPack wants to enforce a group ID
+                groupId = "com.github.logviewer"
+                artifactId = "logviewer"
+                version = "1.0.0"
+            }
+        }
     }
 }
 
