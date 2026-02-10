@@ -13,9 +13,6 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStreamWriter
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class ExportLogFileUtils {
 
@@ -24,8 +21,8 @@ class ExportLogFileUtils {
             if (cacheDir == null || cacheDir.isFile() || logs.isNullOrEmpty()) {
                 null
             } else {
-                val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault())
-                val logFile = File(cacheDir, dateFormat.format(Date()) + ".log")
+                val logFilePrefix = Settings.config.logFilePrefix.getPrefix()
+                val logFile = File(cacheDir, "${logFilePrefix}.log")
                 if (logFile.exists() && !logFile.delete()) {
                     null
                 } else {
@@ -35,9 +32,8 @@ class ExportLogFileUtils {
                                 FileOutputStream(logFile)
                             )
                         )
-                        for (log in logs) {
-                            writer.write(log.origin + "\n")
-                        }
+
+                        Settings.config.logfileFormat.writeLogs(logFile.name, logs, writer)
 
                         writer.close()
                         logFile
