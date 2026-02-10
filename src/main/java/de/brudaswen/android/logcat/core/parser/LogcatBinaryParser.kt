@@ -3,7 +3,7 @@ package de.brudaswen.android.logcat.core.parser
 import de.brudaswen.android.logcat.core.data.LogcatItem
 import de.brudaswen.android.logcat.core.data.LogcatLevel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.invoke
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
@@ -30,9 +30,9 @@ public class LogcatBinaryParser(
      *
      * @return The parsed [LogcatItem] or `null` if stream reached EOF.
      */
-    public suspend fun parseItem(): LogcatItem? = Dispatchers.IO {
+    public suspend fun parseItem(): LogcatItem? = withContext(Dispatchers.IO) {
         val firstByte = input.read()
-        if (firstByte == -1) return@IO null
+        if (firstByte == -1) return@withContext null
 
         // Read v1 header
         buffer.writeByte(firstByte.toByte())
