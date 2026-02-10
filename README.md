@@ -1,5 +1,77 @@
-# LogcatViewer library
 
+### About this fork:
+#### Additional Features:
+- aims working with android sdk19
+- uses LogcatBinaryParser.kt from de.brudaswen.android.logcat.core.parser
+- allows customized output format and global library settings.
+  See example (1) below
+
+#### Fixes (only dev facing):
+- use flow and coroutins
+- some typo fixes
+- extract common code into LogcatReader
+
+##### Settings example
+Define a method to change the default config to your preference
+
+```kotlin
+fun setupCustomLogcatSettings() {
+    val customLogfileFormat = object : LogFileFormat {
+        override suspend fun writeLogs(
+            logFileName: String,
+            logs: Array<LogItem>,
+            writer: BufferedWriter
+        ) {
+            if (logs.isNotEmpty()) {
+                writer.write("Logcat: $logFileName\n")
+                writer.write("------------------\n")
+                for (log in logs) {
+                    writer.write(log.origin + "\n")
+                }
+            }
+        }
+    }
+
+    val customLogFilePrefix: LogFilePrefix = object : LogFilePrefix {
+        override suspend fun getPrefix(): String {
+            val dateFormat =
+                SimpleDateFormat("'${BuildConfig.FLAVOR}_'yyyy-MM-dd_HH:mm:ss.SSS", Locale.ROOT)
+            return dateFormat.format(Date())
+        }
+    }
+
+    Settings.update { current ->
+        current.copy(
+            logfileFormat = customLogfileFormat,
+            logFilePrefix = customLogFilePrefix
+        )
+    }
+}
+```
+
+#### Repository
+Releases are distributed via jitpack. Make sure you include jitpack in
+your `build.gradle` or `settings.gradle.kts`:
+
+```gradle
+dependencyResolutionManagement {
+	repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+	repositories {
+		mavenCentral()
+		maven { url = uri("https://jitpack.io") }
+	}
+}
+```
+
+```gradle
+dependencies {
+        implementation("com.github.evermind-zz:logcatviewer:Tag")
+}
+```
+
+---
+original README:
+# LogcatViewer library
 ### Feature:
 
 - Priority filter
