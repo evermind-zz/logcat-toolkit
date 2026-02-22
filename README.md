@@ -32,10 +32,10 @@ fun setupCustomLogcatSettings() {
         }
     }
 
-    val customLogFilePrefix: LogFilePrefix = object : LogFilePrefix {
-        override suspend fun getPrefix(): String {
+    val customLogFileName: LogFileName = object : LogFileName {
+        override fun getLogFileName(): String {
             val dateFormat =
-                SimpleDateFormat("'${BuildConfig.FLAVOR}_'yyyy-MM-dd_HH:mm:ss.SSS", Locale.ROOT)
+                SimpleDateFormat("'${BuildConfig.FLAVOR}_'yyyy-MM-dd_HH:mm:ss.SSS'.log'", Locale.ROOT)
             return dateFormat.format(Date())
         }
     }
@@ -62,7 +62,7 @@ fun setupCustomLogcatSettings() {
     Settings.update { current ->
         current.copy(
             logfileFormat = customLogfileFormat,
-            logFilePrefix = customLogFilePrefix,
+            logFileName = customLogFileName,
             logFileShare = customLogFileShare,
             logCleanupStrategy = customCleanupStrategy
         )

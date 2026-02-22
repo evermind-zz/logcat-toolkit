@@ -44,9 +44,9 @@ data class LogConfig(
         }
     },
 
-    val logFilePrefix: LogFilePrefix = object : LogFilePrefix {
-        override suspend fun getPrefix(): String {
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault())
+    val logFileName: LogFileName = object : LogFileName {
+        override fun getLogFileName(): String {
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS'.log'", Locale.getDefault())
             return dateFormat.format(Date())
         }
     },
@@ -69,13 +69,13 @@ interface LogFileFormat {
 }
 
 /**
- * Set your implementation if you want to override the config filename prefix.
+ * Set your implementation if you want to override the filename of the logfile.
  *
- * Eg your prefix is my_logfile. the final name will be my_logfile.log
+ * e.g. my_logfile.log
  */
-interface LogFilePrefix {
+interface LogFileName {
     /**
-     * write logs to output.
+     * get the name of the to be generated logfile.
      */
-    suspend fun getPrefix(): String
+    fun getLogFileName(): String
 }

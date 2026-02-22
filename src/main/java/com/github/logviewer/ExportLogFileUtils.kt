@@ -22,8 +22,7 @@ class ExportLogFileUtils {
             if (cacheDir == null || cacheDir.isFile || logs.isNullOrEmpty()) {
                 null
             } else {
-                val logFilePrefix = Settings.config.logFilePrefix.getPrefix()
-                val logFile = File(cacheDir, "${logFilePrefix}.log")
+                val logFile = File(cacheDir, Settings.config.logFileName.getLogFileName())
                 if (logFile.exists() && !logFile.delete()) {
                     null
                 } else {
