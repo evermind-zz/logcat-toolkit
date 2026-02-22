@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicReference
 /**
  * global settings object.
  */
-object Settings {
+class Settings {
     private val configRef = AtomicReference(LogConfig())
 
     val config: LogConfig get() = configRef.get()
@@ -28,6 +28,11 @@ object Settings {
             val next = transform(current)
             success = configRef.compareAndSet(current, next)
         }
+    }
+
+    companion object {
+        @JvmField
+        val Default = Settings()
     }
 }
 

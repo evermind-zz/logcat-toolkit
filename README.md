@@ -59,7 +59,7 @@ fun setupCustomLogcatSettings() {
 
         }, 20)
 
-    Settings.update { current ->
+    Settings.Default.update { current ->
         current.copy(
             logfileFormat = customLogfileFormat,
             logFileName = customLogFileName,

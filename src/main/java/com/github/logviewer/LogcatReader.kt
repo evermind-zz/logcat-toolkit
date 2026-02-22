@@ -13,7 +13,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.util.regex.Pattern
 
-class LogcatReader {
+class LogcatReader(val settings: Settings = Settings.Default) {
 
     private var logcatJob: Job? = null
 

@@ -15,14 +15,14 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStreamWriter
 
-class ExportLogFileUtils {
+class ExportLogFileUtils(val settings: Settings = Settings.Default) {
 
     private suspend fun exportLogs(cacheDir: File?, logs: Array<LogItem>?): File? =
         withContext(Dispatchers.IO) {
             if (cacheDir == null || cacheDir.isFile || logs.isNullOrEmpty()) {
                 null
             } else {
-                val logFile = File(cacheDir, Settings.config.logFileName.getLogFileName())
+                val logFile = File(cacheDir, settings.config.logFileName.getLogFileName())
                 if (logFile.exists() && !logFile.delete()) {
                     null
                 } else {
@@ -33,7 +33,7 @@ class ExportLogFileUtils {
                             )
                         )
 
-                        Settings.config.logfileFormat.writeLogs(logFile.name, logs, writer)
+                        settings.config.logfileFormat.writeLogs(logFile.name, logs, writer)
 
                         writer.close()
                         logFile
@@ -78,13 +78,13 @@ class ExportLogFileUtils {
                 "${context.packageName}.logcat_fileprovider",
                 exportedFile
             )
-            val shareIntent = Settings.config.logFileShare.createIntent(
+            val shareIntent = settings.config.logFileShare.createIntent(
                 context,
                 logUri,
                 exportedFile.name
             )
             val isSharingSupported =
-                Settings.config.logFileShare.launchIntent(context, shareIntent)
+                settings.config.logFileShare.launchIntent(context, shareIntent)
             if (!isSharingSupported) {
                 showFeedback(
                     rootView,
