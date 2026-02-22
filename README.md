@@ -59,12 +59,16 @@ fun setupCustomLogcatSettings() {
 
         }, 20)
 
+    val customLogStorageLocation: ExportLogFileUtils.StorageLocation =
+        ExportLogFileUtils.StorageLocation.CACHE_EXTERNAL
+
     Settings.Default.update { current ->
         current.copy(
             logfileFormat = customLogfileFormat,
             logFileName = customLogFileName,
             logFileShare = customLogFileShare,
-            logCleanupStrategy = customCleanupStrategy
+            logCleanupStrategy = customCleanupStrategy,
+            logStorageLocation = customLogStorageLocation
         )
     }
 }

@@ -38,7 +38,7 @@ class Settings {
 
 data class LogConfig(
     var logfileFormat: LogFileFormat = object : LogFileFormat {
-        override suspend fun writeLogs(
+        override fun writeLogs(
             logFileName: String,
             logs: Array<LogItem>,
             writer: BufferedWriter
@@ -60,7 +60,9 @@ data class LogConfig(
     /**
      *  chosen default strategy delete all except last 10 logs
      */
-    var logCleanupStrategy: CleanupConfig = CleanupConfig(DeleteAllExceptLastStrategy(), 10)
+    var logCleanupStrategy: CleanupConfig = CleanupConfig(DeleteAllExceptLastStrategy(), 10),
+
+    val logStorageLocation: ExportLogFileUtils.StorageLocation = ExportLogFileUtils.StorageLocation.CACHE_INTERNAL
 )
 
 /**
@@ -70,7 +72,7 @@ interface LogFileFormat {
     /**
      * write logs to output.
      */
-    suspend fun writeLogs(logFileName: String, logs: Array<LogItem>, writer: BufferedWriter)
+    fun writeLogs(logFileName: String, logs: Array<LogItem>, writer: BufferedWriter)
 }
 
 /**

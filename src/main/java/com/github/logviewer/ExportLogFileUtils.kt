@@ -16,8 +16,18 @@ import java.io.IOException
 import java.io.OutputStreamWriter
 
 class ExportLogFileUtils(val settings: Settings = Settings.Default) {
+    /**
+     * [CACHE_EXTERNAL] this path is currently only exposed via the [LogcatFileProvider]'s XML
+     */
+    enum class StorageLocation {
+        /** [Context.externalCacheDir] */
+        CACHE_EXTERNAL,
 
-    private suspend fun exportLogs(cacheDir: File?, logs: Array<LogItem>?): File? =
+        /**  [Context.cacheDir] */
+        CACHE_INTERNAL
+    }
+
+    private suspend fun writeLogDataToFileInternal(cacheDir: File?, logs: Array<LogItem>?): File? =
         withContext(Dispatchers.IO) {
             if (cacheDir == null || cacheDir.isFile || logs.isNullOrEmpty()) {
                 null
@@ -45,6 +55,18 @@ class ExportLogFileUtils(val settings: Settings = Settings.Default) {
             }
         }
 
+    suspend fun writeLogDataToFile(context: Context, logs: Array<LogItem>?): File? {
+        val logDir = if (settings.config.logStorageLocation == StorageLocation.CACHE_INTERNAL) {
+            context.cacheDir
+        } else {
+            context.externalCacheDir
+        }
+        logDir?.let {
+            settings.config.logCleanupStrategy.apply(logDir)
+        }
+        return writeLogDataToFileInternal(logDir, logs)
+    }
+
     fun exportLog(
         context: Context,
         logData: Array<LogItem>,
@@ -61,11 +83,7 @@ class ExportLogFileUtils(val settings: Settings = Settings.Default) {
         logData: Array<LogItem>,
         rootView: View
     ) {
-        val logDir = context.externalCacheDir
-        logDir?.let {
-            Settings.config.logCleanupStrategy.apply(logDir)
-        }
-        val exportedFile = exportLogs(logDir, logData)
+        val exportedFile = writeLogDataToFile(context, logData)
 
         if (exportedFile == null) {
             showFeedback(
