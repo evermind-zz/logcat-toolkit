@@ -1,10 +1,13 @@
 package com.github.logviewer
 
+import android.content.Context
+import com.github.logviewer.ExportLogFileUtils.StorageLocation
 import com.github.logviewer.settings.CleanupConfig
 import com.github.logviewer.settings.DeleteAllExceptLastStrategy
 import com.github.logviewer.settings.LogFileShare
 import com.github.logviewer.settings.LogFileShareDefault
 import java.io.BufferedWriter
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -68,8 +71,35 @@ data class LogConfig(
 
     val logOpMode: LogcatReader.OperationMode = LogcatReader.OperationMode.CONTINUE,
 
-    val logStorageLocation: ExportLogFileUtils.StorageLocation = ExportLogFileUtils.StorageLocation.CACHE_INTERNAL
-)
+    val logStorageLocation: StorageLocation = StorageLocation.CACHE_INTERNAL
+) {
+    companion object {
+        /**
+         * The folder containing the logs relative to [StorageLocation].
+         *
+         */
+        // it has to be the same folder name as it is defined in 'main/res/xml/logcat_filepaths.xml'
+        const val RELATIVE_LOG_DIR = "logcatviewer_logs"
+    }
+
+    fun getLogFolder(context: Context): File? {
+        val parentDir = if (logStorageLocation == StorageLocation.CACHE_INTERNAL) {
+            context.cacheDir
+        } else {
+            context.externalCacheDir
+        }
+
+        val logDir = File(parentDir, LogConfig.RELATIVE_LOG_DIR)
+        if (!logDir.exists()) {
+            logDir.mkdirs()
+        } else {
+            if (logDir.isFile) {
+                return null
+            }
+        }
+        return logDir
+    }
+}
 
 /**
  * set your implementation if you want to change the output format of the logfile.

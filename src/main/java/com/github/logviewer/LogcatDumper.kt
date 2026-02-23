@@ -4,6 +4,7 @@ import android.content.Context
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.io.File
 
 /**
  * Using logcat to dump log entries to a file for a specific time period.
@@ -33,6 +34,13 @@ class LogcatDumper(
     private val logcatReader = LogcatReader(settings)
 
     private val fileAdapter = LogcatDumpAdapter(context, settings)
+
+    /**
+     * expose the relative logFolder as internal Settings object is not visible to user.
+     */
+    fun getLogFolder(context: Context): File? {
+        return settings.config.getLogFolder(context)
+    }
 
     /**
      * dump logcat data to logfile using [kotlinx.coroutines.GlobalScope]

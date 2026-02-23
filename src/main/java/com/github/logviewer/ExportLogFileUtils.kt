@@ -27,12 +27,12 @@ class ExportLogFileUtils(val settings: Settings = Settings.Default) {
         CACHE_INTERNAL
     }
 
-    private suspend fun writeLogDataToFileInternal(cacheDir: File?, logs: Array<LogItem>?): File? =
+    private suspend fun writeLogDataToFileInternal(logDir: File?, logs: Array<LogItem>?): File? =
         withContext(Dispatchers.IO) {
-            if (cacheDir == null || cacheDir.isFile || logs.isNullOrEmpty()) {
+            if (logDir == null || logDir.isFile || logs.isNullOrEmpty()) {
                 null
             } else {
-                val logFile = File(cacheDir, settings.config.logFileName.getLogFileName())
+                val logFile = File(logDir, settings.config.logFileName.getLogFileName())
                 if (logFile.exists() && !logFile.delete()) {
                     null
                 } else {
@@ -56,11 +56,7 @@ class ExportLogFileUtils(val settings: Settings = Settings.Default) {
         }
 
     suspend fun writeLogDataToFile(context: Context, logs: Array<LogItem>?): File? {
-        val logDir = if (settings.config.logStorageLocation == StorageLocation.CACHE_INTERNAL) {
-            context.cacheDir
-        } else {
-            context.externalCacheDir
-        }
+        val logDir = settings.config.getLogFolder(context)
         logDir?.let {
             settings.config.logCleanupStrategy.apply(logDir)
         }
