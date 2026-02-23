@@ -1,3 +1,4 @@
 <paths>
-    <external-cache-path name="logs" path="." />
+    <external-cache-path name="logs" path="logcatviewer_logs" />
+    <cache-path name="internal_logs" path="logcatviewer_logs" />
 </paths>

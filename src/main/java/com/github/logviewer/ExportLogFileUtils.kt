@@ -17,7 +17,7 @@ import java.io.OutputStreamWriter
 
 class ExportLogFileUtils(val settings: Settings = Settings.Default) {
     /**
-     * [CACHE_EXTERNAL] this path is currently only exposed via the [LogcatFileProvider]'s XML
+     * [CACHE_INTERNAL] and [CACHE_EXTERNAL] are exposed via the [LogcatFileProvider]'s XML.
      */
     enum class StorageLocation {
         /** [Context.externalCacheDir] */
