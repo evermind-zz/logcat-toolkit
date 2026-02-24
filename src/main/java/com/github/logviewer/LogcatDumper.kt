@@ -6,7 +6,7 @@ import com.github.logviewer.settings.CleanupConfig
 import com.github.logviewer.settings.KeepLastNFilesStrategy
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -129,13 +129,18 @@ class LogcatDumper(
         }
 
         override fun onFinish() {
-            @OptIn(DelicateCoroutinesApi::class)
-            GlobalScope.launch {
-                exportLogFileUtils.writeLogDataToFile(
-                    context,
-                    allFilteredLogItemsForExportingToFile.toTypedArray()
-                )
-                isCurrentlyDumping.set(false)
+            /** as [LogcatDumper] uses [GlobalScope] we do not need to launch it in another scope */
+            runBlocking {
+                try {
+                    exportLogFileUtils.writeLogDataToFile(
+                        context,
+                        allFilteredLogItemsForExportingToFile.toTypedArray()
+                    )
+                } finally {
+                    // remove all entries for next round
+                    allFilteredLogItemsForExportingToFile.clear()
+                    isCurrentlyDumping.set(false)
+                }
             }
         }
     }

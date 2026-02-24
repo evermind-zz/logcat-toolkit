@@ -85,14 +85,14 @@ class LogcatReader(val settings: Settings = Settings.Default) {
         stopReadLogcat()
 
         logcatJob = coroutineScope.launch {
-            getLogcatFlow(excludeList)
-                .chunked(size = 50, timeMillis = 100L)
-                .flowOn(Dispatchers.IO)
-                .collect { items ->
-                    logcatSink.appendList(items)
-                }
-        } .apply {
-            invokeOnCompletion {
+            try {
+                getLogcatFlow(excludeList)
+                    .chunked(size = 50, timeMillis = 100L)
+                    .flowOn(Dispatchers.IO)
+                    .collect { items ->
+                        logcatSink.appendList(items)
+                    }
+            } finally {
                 logcatSink.onFinish()
             }
         }

@@ -4,6 +4,9 @@ import java.util.List;
 
 /**
  * push the logcat data to the consumer
+ * <p>
+ * {@link #appendList} and {@link #onFinish} will be called within the same
+ * CoroutineScope in {@link LogcatReader}
  */
 public interface LogcatSink {
     /**
