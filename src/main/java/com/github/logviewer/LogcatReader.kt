@@ -65,7 +65,7 @@ class LogcatReader(val settings: Settings = Settings.Default) {
             // terminate the process also when the flow is stopped
             process.destroy()
         }
-    }.flowOn(Dispatchers.IO)
+    }
 
 
     /**
@@ -87,6 +87,7 @@ class LogcatReader(val settings: Settings = Settings.Default) {
         logcatJob = coroutineScope.launch {
             getLogcatFlow(excludeList)
                 .chunked(size = 50, timeMillis = 100L)
+                .flowOn(Dispatchers.IO)
                 .collect { items ->
                     logcatSink.appendList(items)
                 }
