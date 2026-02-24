@@ -1,6 +1,8 @@
 package com.github.logviewer
 
 import android.content.Context
+import com.github.logviewer.settings.CleanupConfig
+import com.github.logviewer.settings.KeepLastNFilesStrategy
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -21,6 +23,7 @@ class LogcatDumper(
     context: Context,
     private val logFileName: LogFileNameFromTimestamp,
     logFileFormat: LogFileFormat = Settings.Default.config.logfileFormat,
+    logCleanupStrategy: CleanupConfig = CleanupConfig(KeepLastNFilesStrategy(), 2),
     logStorageLocation: ExportLogFileUtils.StorageLocation =
         ExportLogFileUtils.StorageLocation.CACHE_EXTERNAL
 ) {
@@ -28,6 +31,7 @@ class LogcatDumper(
     private val settings = createInternalSettings(
         logFileName,
         logFileFormat,
+        logCleanupStrategy,
         logStorageLocation
     )
 
@@ -70,6 +74,7 @@ class LogcatDumper(
     private fun createInternalSettings(
         logFileName: LogFileName,
         logFileFormat: LogFileFormat,
+        logCleanupStrategy: CleanupConfig,
         logStorageLocation: ExportLogFileUtils.StorageLocation
     ): Settings {
         /** create independent instance of [Settings.Default] */
@@ -78,6 +83,7 @@ class LogcatDumper(
             current.copy(
                 logfileFormat = logFileFormat,
                 logFileName = logFileName,
+                logCleanupStrategy = logCleanupStrategy,
                 logOpMode = LogcatReader.OperationMode.DUMP,
                 logStorageLocation = logStorageLocation
             )
