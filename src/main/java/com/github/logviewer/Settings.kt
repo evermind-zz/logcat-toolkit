@@ -80,24 +80,58 @@ data class LogConfig(
          */
         // it has to be the same folder name as it is defined in 'main/res/xml/logcat_filepaths.xml'
         const val RELATIVE_LOG_DIR = "logcat_toolkit_logs"
+
+        /**
+         * create this empty file to ensure that we created that directory
+         * and per our own convention are entitled to delete stuff there.
+         */
+        const val LOGCAT_TOOLKIT_MARKER_FILE = ".logcat_toolkit_root"
     }
 
-    fun getLogFolder(context: Context): File? {
+    fun getLogFolder(context: Context): File {
         val parentDir = if (logStorageLocation == StorageLocation.CACHE_INTERNAL) {
             context.cacheDir
         } else {
             context.externalCacheDir
         }
 
-        val logDir = File(parentDir, LogConfig.RELATIVE_LOG_DIR)
-        if (!logDir.exists()) {
-            logDir.mkdirs()
-        } else {
-            if (logDir.isFile) {
-                return null
+        val logDir = File(parentDir, RELATIVE_LOG_DIR)
+        ensureSafeLogDirectory(logDir)
+        return logDir
+    }
+
+    private fun ensureSafeLogDirectory(logDir: File) {
+        synchronized(logDir) {
+            if (!logDir.exists()) {
+                require(logDir.mkdirs()) {
+                    "Failed to create directory: ${logDir.path}"
+                }
+                createMarkerFile(logDir)
+            } else { // marker file should exist
+                require(logDir.isDirectory) {
+                    "${logDir.path} is not a directory"
+                }
+                checkForMarkerFile(logDir)
             }
         }
-        return logDir
+    }
+
+    private fun checkForMarkerFile(logDir: File) {
+        val marker = File(logDir, LOGCAT_TOOLKIT_MARKER_FILE)
+        check(marker.exists()) {
+            val errMsg = "unable to find marker file ${LOGCAT_TOOLKIT_MARKER_FILE}"
+            Log.e(javaClass.simpleName, errMsg)
+            errMsg
+        }
+    }
+
+    private fun createMarkerFile(logDir: File) {
+        val marker = File(logDir, LOGCAT_TOOLKIT_MARKER_FILE)
+        require(marker.createNewFile()) { // only true is the right path here as we come from the mkdirs branch
+            val errMsg = "unable to create marker file ${LOGCAT_TOOLKIT_MARKER_FILE}"
+            Log.e(javaClass.simpleName, errMsg)
+            errMsg
+        }
     }
 }
 
