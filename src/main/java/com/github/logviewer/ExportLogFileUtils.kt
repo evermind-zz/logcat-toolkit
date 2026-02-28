@@ -45,9 +45,7 @@ class ExportLogFileUtils(val settings: Settings = Settings.Default) {
 
     suspend fun writeLogDataToFile(context: Context, logs: Array<LogItem>?): File? {
         val logDir = settings.config.getLogFolder(context)
-        logDir?.let {
-            settings.config.logCleanupStrategy.applyStrategy(logDir)
-        }
+        settings.config.logCleanupStrategy.applyStrategy(logDir)
         return writeLogDataToFileInternal(logDir, logs)
     }
 

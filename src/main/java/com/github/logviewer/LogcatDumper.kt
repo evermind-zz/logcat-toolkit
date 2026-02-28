@@ -49,7 +49,7 @@ class LogcatDumper(
     /**
      * expose the relative logFolder as internal Settings object is not visible to user.
      */
-    fun getLogFolder(context: Context): File? {
+    fun getLogFolder(context: Context): File {
         return settings.config.getLogFolder(context)
     }
 

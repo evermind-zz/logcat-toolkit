@@ -1,6 +1,7 @@
 package com.github.logviewer
 
 import android.content.Context
+import android.util.Log
 import com.github.logviewer.ExportLogFileUtils.StorageLocation
 import com.github.logviewer.settings.CleanupConfig
 import com.github.logviewer.settings.KeepLastNFilesStrategy
