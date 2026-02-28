@@ -1,15 +1,26 @@
+# LogcatToolkit
 
-### About this fork:
-#### Additional Features:
-- aims working with android sdk19
-- uses LogcatBinaryParser.kt from de.brudaswen.android.logcat.core.parser
-- allows customized output format and global library settings.
-  See example (1) below
+### About this `logcatviewer` fork
+This fork is named **LogcatToolkit** to distinguish it from the original `logcatviewer`.
 
-#### Fixes (only dev facing):
-- use flow and coroutins
-- some typo fixes
-- extract common code into LogcatReader
+It is a customizable Logcat utility for Android (SDK 19+), featuring
+background logcat dumping and native binary format parsing.
+
+#### Additional Features
+What makes this library different from the original `logcatviewer`:
+- **SDK 19 Support:** Specifically aimed to work with Android SDK 19 (KitKat) and above.
+- **Improved Parsing:** Uses `LogcatBinaryParser.kt`
+  (from `de.brudaswen.android.logcat.core.parser`) for better handling of system logs.
+- **Highly Customizable:** Allows customized output formats and global
+  library settings (see Example 1 below).
+- **LogcatDumper:** Safely dump a specific time period of logs leading up to a crash.
+  It runs in the background and is manually triggered by the user (see Example 2 below).
+
+#### Technical Improvements (Internal)
+- **Modern Stack:** Fully migrated to **Kotlin Flow** and **Coroutines**.
+- **Refactored Core:** Extracted common logic into `LogcatReader` for better
+  maintainability.
+- **Cleanup:** Fixed various typos and improved overall code structure.
 
 ##### code example (1) global library settings
 Define a method to change the default config to your preference
@@ -148,7 +159,7 @@ dependencyResolutionManagement {
 
 ```gradle
 dependencies {
-        implementation("com.github.evermind-zz:logcatviewer:Tag")
+        implementation("com.github.evermind-zz:logcat-toolkit:Tag")
 }
 ```
 

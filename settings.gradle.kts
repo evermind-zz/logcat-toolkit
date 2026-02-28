@@ -14,4 +14,4 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "logviewer"
+rootProject.name = "LogcatToolkit"

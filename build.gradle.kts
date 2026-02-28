@@ -54,8 +54,8 @@ afterEvaluate {
                 from(components["release"])
 
                 // optional: if JitPack wants to enforce a group ID
-                groupId = "com.github.logviewer"
-                artifactId = "logviewer"
+                groupId = "com.github.evermind-zz.logcat-toolkit"
+                artifactId = "logcat-toolkit"
                 version = "1.0.0"
             }
         }
